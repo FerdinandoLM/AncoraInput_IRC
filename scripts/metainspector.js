@@ -14,6 +14,10 @@ module.exports.main = function(irc_client){
         return;
       }
       for(let u of urls){
+        if (u.match(/.(jpg|png|gifv|mp3|mp4)$/i) !== null){
+          console.log('skipping the image URL ' + u);
+          continue;
+        }
         console.log('analyzing URL ' + u);
         let client = new MetaInspector(u, { timeout: 5000,
           limit: 1024*1024*1,
@@ -25,12 +29,12 @@ module.exports.main = function(irc_client){
             let shortDes = client.title;
             if (client.author) shortDes += ' by ' + client.author;
             if (client.description) shortDes += ' ' + client.description.substr(0,100) + '...';
-            irc_client.say(to, shortDes + ' - ' + u + ' [otr]');
+            irc_client.notice(to, shortDes + ' - ' + u );
           });
 
           client.on("error", function(err){
             console.log('error: ', err)
-            irc_client.say(to, err);
+            irc_client.notice(to, err);
           });
           client.fetch();
         }
